@@ -3,21 +3,20 @@
 void initColor()
 {
 	start_color();
-	
+	//int dex=0;
 	//initialize all colors
 	for (int fg=0; fg<8; ++fg)
 		for (int bg=0; bg<8; ++bg)
 		{
-			init_pair((fg+1)*(bg+1), fg, bg);
-			refresh();
+			//++dex;
+			init_pair(bg+(fg*8)+1, fg, bg);
+			//attron(COLOR_PAIR(dex));
+			//printw("%d %d %d >> %d\n", dex, fg, bg, bg+(fg*8)+1);
 		}
-	
 }
 
-void setColor(int fg, int bg)
+void setColor(WINDOW*win,int fg, int bg)
 {
 	//Offset to min=1
-	++fg;
-	++bg;
-	attron(COLOR_PAIR(fg*bg));
+	wattron(win,COLOR_PAIR(bg+(fg*8)+1));
 }

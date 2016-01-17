@@ -4,6 +4,6 @@
 #include <ncurses.h>
 
 void initColor();
-void setColor(int fg, int bg);
+void setColor(WINDOW*,int fg, int bg);
 
 #endif

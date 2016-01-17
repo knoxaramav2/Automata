@@ -6,6 +6,8 @@ Window::Window(int height, int width, int ypos, int xpos)
 	box(win, 0, 0);
 	wrefresh(win);
 	
+	id=0;
+	
 	this->height=height;
 	this->width=width;
 	this->ypos=ypos;
@@ -24,6 +26,8 @@ Window::Window()
 	box(win, 0, 0);
 	wrefresh(win);
 	
+	id=0;
+	
 	this->height=height;
 	this->width=width;
 	this->ypos=ypos;
@@ -33,8 +37,13 @@ Window::Window()
 Window::~Window()
 {
 	wborder(win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
-	wrefresh(win);
-	delwin(win);
+	
+	//free controls
+}
+
+void Window::rebuildBorder()
+{
+	box(win, 0, 0);
 }
 
 WINDOW*Window::getHandle()
@@ -49,3 +58,78 @@ void Window::getDimensions(int&height, int&width, int&ypos, int&xpos)
 	ypos=this->ypos;
 	xpos=this->xpos;
 }
+
+void Window::update()
+{
+	
+	
+	//input loop: send to focus control (if any)
+}
+
+
+Window * winEnvironment::registerWindow()
+{
+	bool valid=true;
+	unsigned id=0;
+	
+	do{
+	++id;
+	for (unsigned x=0; x<windows.size(); ++x)
+		if (windows[x]->id==id)
+			{
+			valid=false;
+			break;
+			}
+	}while(!valid);
+	
+	Window * ret = new Window();
+	ret->id=id;
+	
+	windows.push_back(ret);
+	
+	return ret;
+}
+
+bool winEnvironment::deregisterWindow(Window*win)
+{	
+	if (win==NULL)
+		return false;
+	
+	for (unsigned x=0; x<windows.size(); ++x)
+	{
+		if (windows[x]==win)
+		{
+			delwin(win->getHandle());
+			windows.erase(windows.begin()+x);
+			delete win;
+			render();
+			return true;
+		}
+	
+	}
+	
+	
+	return false;	
+}
+
+void winEnvironment::render()
+{
+	clear();
+	refresh();
+	for (unsigned x=0; x<windows.size(); ++x)
+		if (windows[x]!=NULL)
+			wrefresh(windows[x]->getHandle());
+	
+}
+
+void winEnvironment::render(Window*win)
+{
+if (win!=NULL)
+	wrefresh(win->getHandle());
+}
+
+void winEnvironment::update()
+{
+	
+}
+

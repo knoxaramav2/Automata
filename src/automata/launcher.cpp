@@ -4,6 +4,7 @@
 #include "Util.hpp"
 #include "Menu.hpp"
 #include "Color.hpp"
+#include "Data.hpp"
 
 #include <ncurses.h>
 #include <string>
@@ -32,7 +33,7 @@ bool initialize()
 	if (DEBUG)
 		printw("%d : %d >> %s", PLATFORM, BITMODE, PLATFORM==PLATFORM_WINDOWS?"Windows":"Linux");	
 	
-	setColor(COLOR_GREEN, COLOR_BLACK);
+	setColor(stdscr,COLOR_GREEN, COLOR_BLACK);
 	
 	return true;
 }
@@ -44,8 +45,9 @@ void shutdown()
 }
 
 //input options
-void CMD(int argc, char**argv)
+options CMD(int argc, char**argv)
 {
+	options opts;
 	bool cnt=true;
 	for (unsigned x=1; x<argc; ++x)
 	{
@@ -55,6 +57,8 @@ void CMD(int argc, char**argv)
 		{
 			switch(argv[x][1])
 			{
+			case 'd': opts.debug=true;break;
+			case 'g': opts.godmode=true;break;
 			case 'v': printw("%s\n",VERSION); break;
 			case 'x': cnt=false; break;
 			default:
@@ -68,6 +72,7 @@ void CMD(int argc, char**argv)
 	}
 	if (!cnt)
 		exit(0);
+	return opts;
 }
 
 void splashScreen()
@@ -108,16 +113,19 @@ int main(int argc, char**argv)
 {
 	if (!initialize())
 		return -1;
-	CMD(argc,argv);
+		
+	registry reg;
+	reg.opts=CMD(argc,argv);
 	
-	//splashScreen();
+	if (!reg.opts.debug)
+		splashScreen();
 	//loads data files
 	
 	//loads mods
 
 	//select new/load
 	clear();
-	switch(splashMenu())
+	switch(splashMenu(reg))
 	{
 		case MENU_NEW:break;
 		case MENU_LOAD:break;
